@@ -554,8 +554,9 @@ serve(async (request) => {
     例如: `BASE_URL = "https://api.openai.com";` 改成 `BASE_URL = "https://你的地址/openai";`
     请求就会变成 `https://你的地址/openai/v1/completions`。
 
-### 注意事项
-1. Gemini已经转成了Openai格式,所以Gemini的请求地址也要改成Openai格式的。不能直接使用Gemini的请求格式。
+:::important
+Gemini已经转成了Openai格式，所以Gemini的请求地址也要改成Openai格式的。不能直接使用Gemini的请求格式。
+:::
 
 ### 代理地址
 
