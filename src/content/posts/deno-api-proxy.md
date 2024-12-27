@@ -1,6 +1,6 @@
 ---
-title: 使用Deno构建多种大模型AI API代理
-published: 2024-12-19
+title: 使用Deno构建多种大模型AI API代理(2024.12.28更新)
+published: 2024-12-28
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
 tags: [LLM, Deno, AI]
@@ -39,6 +39,7 @@ const apiMapping = {
   '/openrouter': 'https://openrouter.ai/api',
   '/nvidia': 'https://integrate.api.nvidia.com',
   '/cerebras': 'https://api.cerebras.ai',
+  '/sambanova': 'https://api.sambanova.ai',
   '/gemini': 'https://generativelanguage.googleapis.com'
 };
 
@@ -334,10 +335,12 @@ const reasonsMap = {
   "SAFETY": "content_filter",
   "RECITATION": "content_filter",
 };
-
+const SEP = "\n\n|>";
 const transformCandidates = (key, cand) => ({
   index: cand.index || 0,
-  [key]: { role: "assistant", content: cand.content?.parts[0].text },
+  [key]: {
+  role: "assistant",
+  content: cand.content?.parts.map(p => p.text).join(SEP) },
   logprobs: null,
   finish_reason: reasonsMap[cand.finishReason] || cand.finishReason,
 });
@@ -420,6 +423,7 @@ async function toOpenAiStream(chunk, controller) {
     data = { candidates };
   }
   const cand = data.candidates[0];
+  console.assert(data.candidates.length === 1, "Unexpected candidates count: %d", data.candidates.length);
   cand.index = cand.index || 0;
   if (!this.last[cand.index]) {
     controller.enqueue(transform(data, false, "first"));
@@ -579,6 +583,7 @@ Gemini已经转成了Openai格式，所以Gemini的请求地址也要改成Opena
 | `https://你的地址/telegram` | `https://api.telegram.org` |
 | `https://你的地址/together` | `https://api.together.xyz` |
 | `https://你的地址/xai` | `https://api.x.ai` |
+| `https://你的地址/sambanova` | `https://api.sambanova.ai` |
 
 ### 参考项目
 - [openai-gemini](https://github.com/PublicAffairs/openai-gemini)
