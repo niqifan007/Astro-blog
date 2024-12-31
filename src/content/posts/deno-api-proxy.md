@@ -1,6 +1,6 @@
 ---
-title: 使用Deno构建多种大模型AI API代理(2024.12.28更新)
-published: 2024-12-28
+title: 使用Deno构建多种大模型AI API代理(2024.12.31更新)
+published: 2024-12-31
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
 tags: [LLM, Deno, AI]
@@ -69,7 +69,7 @@ const handleOPTIONS = async () => {
 
 const BASE_URL = "https://generativelanguage.googleapis.com";
 const API_VERSION = "v1beta";
-const API_CLIENT = "genai-js/0.19.0";
+const API_CLIENT = "genai-js/0.21.0";
 
 const makeHeaders = (apiKey, more) => ({
   "x-goog-api-client": API_CLIENT,
