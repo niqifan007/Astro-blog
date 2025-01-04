@@ -1,6 +1,6 @@
 ---
 title: 使用Deno构建多种大模型AI API代理(2025.1.4更新)
-published: 2024-01-04
+published: 2025-01-04
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
 tags: [LLM, Deno, AI]
