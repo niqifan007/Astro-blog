@@ -1,6 +1,6 @@
 ---
-title: 使用Deno构建多种大模型AI API代理(2024.12.31更新)
-published: 2024-12-31
+title: 使用Deno构建多种大模型AI API代理(2025.1.4更新)
+published: 2024-01-04
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
 tags: [LLM, Deno, AI]
@@ -560,7 +560,167 @@ serve(async (request) => {
 
 :::important
 Gemini已经转成了Openai格式，所以Gemini的请求地址也要改成Openai格式的。不能直接使用Gemini的请求格式。
+如果只想单纯的代理Gemini的请求，可以部署下面的代码。
 :::
+
+```typescript
+import { serve } from "https://deno.land/std/http/server.ts";
+
+const apiMapping = {
+  '/discord': 'https://discord.com/api',
+  '/telegram': 'https://api.telegram.org',
+  '/openai': 'https://api.openai.com',
+  '/claude': 'https://api.anthropic.com',
+  '/meta': 'https://www.meta.ai/api',
+  '/groq': 'https://api.groq.com/openai',
+  '/xai': 'https://api.x.ai',
+  '/cohere': 'https://api.cohere.ai',
+  '/huggingface': 'https://api-inference.huggingface.co',
+  '/together': 'https://api.together.xyz',
+  '/novita': 'https://api.novita.ai',
+  '/portkey': 'https://api.portkey.ai',
+  '/fireworks': 'https://api.fireworks.ai',
+  '/openrouter': 'https://openrouter.ai/api',
+  '/nvidia': 'https://integrate.api.nvidia.com',
+  '/cerebras': 'https://api.cerebras.ai',
+  '/sambanova': 'https://api.sambanova.ai',
+  '/gemini': 'https://generativelanguage.googleapis.com'
+};
+
+const CORS_HEADERS = {
+  "access-control-allow-origin": "*",
+  "access-control-allow-methods": "*",
+  "access-control-allow-headers": "*",
+};
+
+serve(async (request) => {
+  // 处理 CORS 预检请求
+  if (request.method === "OPTIONS") {
+    return new Response(null, {
+      headers: CORS_HEADERS,
+    });
+  }
+
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+
+  if (pathname === '/' || pathname === '/index.html') {
+    return new Response('Service is running!', {
+      status: 200,
+      headers: { 
+        'Content-Type': 'text/html',
+        ...CORS_HEADERS 
+      }
+    });
+  } 
+  
+  if (pathname === '/robots.txt') {
+    return new Response('User-agent: *\nDisallow: /', {
+      status: 200,
+      headers: { 
+        'Content-Type': 'text/plain',
+        ...CORS_HEADERS 
+      }
+    });
+  }
+
+  const [prefix, rest] = extractPrefixAndRest(pathname, Object.keys(apiMapping));
+  if (!prefix) {
+    return new Response('Not Found', { status: 404 });
+  }
+
+  try {
+    // 特殊处理 Gemini API 请求
+    if (prefix === '/gemini') {
+      const targetUrl = new URL(`${apiMapping[prefix]}${rest}`);
+      
+      // 转发所有查询参数
+      url.searchParams.forEach((value, key) => {
+        targetUrl.searchParams.append(key, value);
+      });
+
+      const headers = new Headers();
+      const geminiHeaders = [
+        'accept',
+        'content-type',
+        'authorization',
+        'x-goog-api-client',
+        'x-goog-api-key'
+      ];
+
+      for (const [key, value] of request.headers.entries()) {
+        if (geminiHeaders.includes(key.toLowerCase())) {
+          headers.set(key, value);
+        }
+      }
+
+      const response = await fetch(targetUrl, {
+        method: request.method,
+        headers: headers,
+        body: request.body
+      });
+
+      const responseHeaders = new Headers({
+        ...CORS_HEADERS,
+        ...Object.fromEntries(response.headers),
+        'X-Content-Type-Options': 'nosniff',
+        'X-Frame-Options': 'DENY',
+        'Referrer-Policy': 'no-referrer'
+      });
+
+      return new Response(response.body, {
+        status: response.status,
+        headers: responseHeaders
+      });
+    }
+
+    // 处理其他 API 请求
+    const targetUrl = `${apiMapping[prefix]}${rest}`;
+    const headers = new Headers();
+    const allowedHeaders = ['accept', 'content-type', 'authorization'];
+    
+    for (const [key, value] of request.headers.entries()) {
+      if (allowedHeaders.includes(key.toLowerCase())) {
+        headers.set(key, value);
+      }
+    }
+
+    const response = await fetch(targetUrl, {
+      method: request.method,
+      headers: headers,
+      body: request.body
+    });
+
+    const responseHeaders = new Headers(response.headers);
+    responseHeaders.set('X-Content-Type-Options', 'nosniff');
+    responseHeaders.set('X-Frame-Options', 'DENY');
+    responseHeaders.set('Referrer-Policy', 'no-referrer');
+    
+    // 添加 CORS 头
+    Object.entries(CORS_HEADERS).forEach(([key, value]) => {
+      responseHeaders.set(key, value);
+    });
+
+    return new Response(response.body, {
+      status: response.status,
+      headers: responseHeaders
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch:', error);
+    return new Response('Internal Server Error', { status: 500 });
+  }
+});
+
+function extractPrefixAndRest(pathname: string, prefixes: string[]): [string | null, string | null] {
+  for (const prefix of prefixes) {
+    if (pathname.startsWith(prefix)) {
+      return [prefix, pathname.slice(prefix.length)];
+    }
+  }
+  return [null, null];
+}
+```
 
 ### 代理地址
 
