@@ -564,7 +564,7 @@ serve(async (request) => {
     例如: `BASE_URL = "https://api.openai.com";` 改成 `BASE_URL = "https://你的地址/openai";`
     请求就会变成 `https://你的地址/openai/v1/completions`。
 
-:::important
+:::note
 Gemini已经转成了Openai格式，所以Gemini的请求地址也要改成Openai格式的。不能直接使用Gemini的请求格式。
 如果只想单纯的代理Gemini的请求，可以部署下面的代码。
 :::
@@ -752,4 +752,5 @@ function extractPrefixAndRest(pathname: string, prefixes: string[]): [string | n
 | `https://你的地址/sambanova` | `https://api.sambanova.ai` |
 
 ### 参考项目
-- [openai-gemini](https://github.com/PublicAffairs/openai-gemini)
+::github{repo="PublicAffairs/openai-gemini"}
+
