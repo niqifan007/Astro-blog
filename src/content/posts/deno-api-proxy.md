@@ -1,6 +1,6 @@
 ---
-title: 使用Deno构建多种大模型AI API代理(2025.1.4更新)
-published: 2025-01-04
+title: 使用Deno构建多种大模型AI API代理(2025.1.10更新)
+published: 2025-01-10
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
 tags: [LLM, Deno, AI]
@@ -16,6 +16,9 @@ lang: ''
 ### 为什么使用 Deno
 众所周知cloudflare workers可以作为一个非常好的反向代理服务,但是它的免费版有很多限制,比如每天的请求次数有限制,还有会暴露你的ip地址等。
 Deno是一个安全的运行时环境,它的安全性和性能都非常好,而且它的部署也非常简单。
+
+### 更新日志
+- 2025.1.10 更新: 避免出现 "Unable to submit request because it must have a text parameter"
 
 ### 代码实现
 ```typescript
@@ -294,6 +297,9 @@ const transformMsg = async ({ role, content }) => {
       default:
         throw new TypeError(`Unknown "content" item type: "${item.type}"`);
     }
+  }
+  if (content.every(item => item.type === "image_url")) {
+    parts.push({ text: "" }); // to avoid "Unable to submit request because it must have a text parameter"
   }
   return { role, parts };
 };
