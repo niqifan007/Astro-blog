@@ -1,5 +1,5 @@
 ---
-title: 使用Deno构建多种大模型AI API代理(2025.1.10更新)
+title: 使用Deno构建多种大模型AI API代理
 published: 2025-01-10
 description: '使用deno将多种AI API的代理整合到一个服务中(openai, gemini等)'
 image: 'https://i.111666.best/image/g7lNeIW4q2FnEnvKbY0XRL.jpg'
@@ -752,4 +752,4 @@ function extractPrefixAndRest(pathname: string, prefixes: string[]): [string | n
 | `https://你的地址/sambanova` | `https://api.sambanova.ai` |
 
 ### 参考项目
-- [openai-gemini](https://github.com/PublicAffairs/openai-gemini)
+::github{repo="PublicAffairs/openai-gemini"}
